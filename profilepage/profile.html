@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile Page</title>
+  <style>
+    /* Base styles */
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      font-family: Arial, sans-serif;
+      color: #fff;
+    }
+    
+    /* Main container holding two columns */
+    .main-container {
+      display: flex;
+      min-height: 100vh;
+      justify-content: center;
+    }
+    
+    /* Left column: Profile Container (25% width) */
+    #profile-container {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 20px;
+      border-radius: 0px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      width: 25%;
+      min-width: 250px;
+    }
+    
+    #profile-pic {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #fff;
+      margin-bottom: 15px;
+    }
+    
+    #profile-name {
+      font-size: 1.8rem;
+      margin: 10px 0;
+      font-weight: bold;
+    }
+    
+    #profile-email {
+      font-size: 1.2rem;
+      margin: 10px 0;
+      opacity: 0.85;
+    }
+    
+    /* Right column: Additional Content (75% width) */
+    .right-container {
+      width: 75%;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      min-height: 100vh;
+    }
+
+    h2, h4{
+        margin: 8px;
+    }
+    
+    /* Sign Out Button */
+    button {
+      background-color: #ff4081;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+    
+    button:hover {
+      background-color: #e91e63;
+    }
+    
+    /* Responsive Design: Stack columns on smaller screens */
+    @media (max-width: 768px) {
+      .main-container {
+        flex-direction: column;
+      }
+      
+      #profile-container,
+      .right-container {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <!-- Left Column: Profile Info -->
+    <div id="profile-container">
+      <h1>User Profile</h1>
+      <img id="profile-pic" src="" alt="Profile Picture">
+      <h2 id="profile-name"></h2>
+      <h3 id="profile-email"></h3>
+      <button id="logout" onclick="logout()">Sign Out</button>
+    </div>
+    
+  </div>
+  <script src="profile.js"></script>
+  
+</body>
+</html>

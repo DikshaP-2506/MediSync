@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Whack-a-Mole</title>
+    <link rel="stylesheet" href="mole.css" />
+    <script defer src="mole.js"></script>
+  </head>
+  <body>
+    <style>
+      /* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.game-container {
+    display: flex;
+    gap: 20px;
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    max-width: 1200px;
+    width: 90%;
+}
+
+/* Score History */
+.score-history {
+    flex: 1;
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Score History */
+#score-history p.highlight {
+    background: #2563EB; /* Blue background */
+    color: white; /* White text */
+    font-weight: bold; /* Bold font */
+    border-left: 4px solid #1E3A8A; /* Dark blue border */
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#high-score-display > p:first-child{
+    background: #2563EB; /* Blue background */
+    color: white; /* White text */
+    font-weight: bold; /* Bold font */
+    padding: 10px;
+    border-radius: 5px;;
+    font-size: larger;
+}
+
+.score-history h3 {
+    margin-top: 0;
+    color: #2563EB;
+    font-size: 20px;
+    border-bottom: 2px solid #2563EB;
+    padding-bottom: 10px;
+}
+
+#score-history {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-top: 10px;
+}
+
+#score-history p {
+    margin: 10px 0;
+    padding: 10px;
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    color: #333;
+    transition: background 0.3s ease;
+}
+
+#score-history p.highlight {
+    background: #e3f2fd;
+    font-weight: bold;
+    border-left: 4px solid #2563EB;
+}
+
+/* Game Area */
+.game-area {
+    flex: 2;
+    text-align: center;
+}
+
+.game-area h1 {
+    margin: 0;
+    color: #1E3A8A;
+    font-size: 32px;
+}
+
+.game-area h3 {
+    margin: 5px 0 20px;
+    color: #666;
+    font-size: 18px;
+}
+
+.container {
+    margin-bottom: 20px;
+}
+
+.container h2 {
+    margin: 0;
+    color: #2563EB;
+    font-size: 24px;
+}
+
+#restart {
+    padding: 10px 20px;
+    background: #2563EB;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: 16px;
+}
+
+#restart:hover {
+    background: #1E3A8A;
+}
+
+#board {
+    width: 400px;
+    height: 400px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    background: url("../assets/images/games/soil.png");
+    background-size: cover;
+    border: 3px solid #ddd;
+    border-radius: 10px;
+}
+
+#board div {
+    width: 133.33px;
+    height: 133.33px;
+    background-image: url("../assets/images/games/pipe.png");
+    background-size: cover;
+}
+
+#board div img {
+    width: 90px;
+    height: 90px;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+/* High Score Panel */
+.high-score-panel {
+    flex: 1;
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.high-score-panel h3 {
+    margin-top: 0;
+    color: #2563EB;
+    font-size: 20px;
+    border-bottom: 2px solid #2563EB;
+    padding-bottom: 10px;
+}
+
+#high-score-display {
+    text-align: center;
+    margin-top: 10px;
+}
+
+#high-score-display p {
+    margin: 10px 0;
+    font-size: 16px;
+    color: #333;
+}
+
+#high-score-display p.motivational-message {
+    font-style: italic;
+    color: #666;
+    font-size: 18px;
+    margin-top: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .game-container {
+        flex-direction: column;
+        padding: 20px;
+    }
+
+    #board {
+        width: 300px;
+        height: 300px;
+    }
+
+    #board div {
+        width: 100px;
+        height: 100px;
+    }
+
+    #board div img {
+        width: 70px;
+        height: 70px;
+    }
+}
+      
+    </style>
+
+    <!-- -------------------------------------------------HTML HERE STARTS---------------------------------------- -->
+
+    <div class="game-container">
+      <!-- Score History -->
+      <div class="score-history">
+        <h3>Score History</h3>
+        <div id="score-history"></div>
+      </div>
+
+      <!-- Game Area -->
+      <div class="game-area">
+        <h1>Whack-a-Mole</h1>
+        <h3>Hit the mole, avoid the cactus</h3>
+
+        <div class="container">
+          <h2>Your Score: <span id="score">0</span></h2>
+          <button id="restart">Restart Game</button>
+        </div>
+
+        <div id="board"></div>
+      </div>
+
+      <!-- High Score Panel -->
+      <div class="high-score-panel">
+        <h3>High Score</h3>
+        <div id="high-score-display">
+          <p>Score: <span id="high-score">0</span></p>
+          <p>Date: <span id="high-score-date">-</span></p>
+          <p>Time: <span id="high-score-time">-</span></p>
+          <p class="motivational-message">Can you beat your high score?</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="bg-music" loop>
+      <source
+        src="../assets/images/games/Spring-Flowers(chosic.com).mp3"
+        type="audio/mp3"
+      />
+    </audio>
+    <audio id="hit-sound" preload="auto">
+      <source
+        src="../assets/images/games/whack01-105535.mp3"
+        type="audio/mp3"
+      />
+    </audio>
+    <audio id="gameover-sound" preload="auto">
+      <source
+        src="../assets/images/games/videogame-death-sound-43894.mp3"
+        type="audio/mp3"
+      />
+    </audio>
+
+    <!-- -------------------------------------------------SCRIPT HERE STARTS---------------------------------------->
+
+    <script>
+let currMoleTile;
+let currPlantTile;
+let score = 0;
+let gameOver = false;
+let highScore = 0;
+let highScoreDate = "-";
+let highScoreTime = "-";
+
+window.onload = function () {
+    setTimeout(() => {
+        setGame();
+        loadScoreHistory();
+        loadHighScore();
+        playBackgroundMusic();
+    }, 500);
+};
+
+function playBackgroundMusic() {
+    let bgMusic = document.getElementById("bg-music");
+
+    if (bgMusic.paused) {
+        bgMusic
+            .play()
+            .then(() => console.log("Background music playing! 🎵"))
+            .catch(error => console.log("Autoplay blocked: " + error));
+    }
+}
+
+document.addEventListener("click", playBackgroundMusic);
+
+function setGame() {
+    for (let i = 0; i < 9; i++) {
+        let tile = document.createElement("div");
+        tile.id = i.toString();
+        tile.addEventListener("click", selectTile);
+        document.getElementById("board").appendChild(tile);
+    }
+    setInterval(setMole, 2500);
+    setInterval(setPlant, 3000);
+}
+
+function getRandomTile() {
+    return Math.floor(Math.random() * 9).toString();
+}
+
+let lastMoleTile = null;
+
+function setMole() {
+    if (gameOver) return;
+
+    if (currMoleTile) currMoleTile.innerHTML = "";
+
+    let num;
+    do {
+        num = getRandomTile();
+    } while (num === lastMoleTile || (currPlantTile && currPlantTile.id === num));
+
+    currMoleTile = document.getElementById(num);
+    lastMoleTile = num;
+
+    let mole = document.createElement("img");
+    mole.src = "../assets/images/games/monty-mole.png";
+    currMoleTile.appendChild(mole);
+
+    setTimeout(() => {
+        if (currMoleTile) currMoleTile.innerHTML = "";
+    }, 1500);
+}
+
+let lastPlantTile = null;
+
+function setPlant() {
+    if (gameOver) return;
+
+    if (currPlantTile) currPlantTile.innerHTML = "";
+
+    let num;
+    do {
+        num = getRandomTile();
+    } while (num === lastPlantTile || num === lastMoleTile);
+
+    currPlantTile = document.getElementById(num);
+    lastPlantTile = num;
+
+    let plant = document.createElement("img");
+    plant.src = "../assets/images/games/piranha-plant.png";
+    currPlantTile.appendChild(plant);
+}
+
+function selectTile() {
+    if (gameOver) return;
+
+    let hitSound = document.getElementById("hit-sound");
+    let gameOverSound = document.getElementById("gameover-sound");
+
+    if (this === currMoleTile) {
+        score += 10;
+        document.getElementById("score").innerText = score.toString();
+
+        hitSound.currentTime = 0;
+        hitSound.play();
+
+        checkHighScore();
+    } else if (this === currPlantTile) {
+        document.getElementById("score").innerText = "GAME OVER: " + score.toString();
+
+        gameOverSound.currentTime = 0;
+        gameOverSound.play();
+
+        saveScore(score);
+        gameOver = true;
+    }
+}
+
+function saveScore(score) {
+    let scores = JSON.parse(localStorage.getItem("scores")) || [];
+    scores.push({ score: score, date: new Date().toLocaleString() });
+    localStorage.setItem("scores", JSON.stringify(scores));
+    loadScoreHistory();
+}
+
+function loadScoreHistory() {
+    let scores = JSON.parse(localStorage.getItem("scores")) || [];
+    let historyDiv = document.getElementById("score-history");
+    historyDiv.innerHTML = "";
+
+    scores.slice().reverse().forEach(entry => {
+        let p = document.createElement("p");
+        p.innerText = `Score: ${entry.score} - ${entry.date}`;
+        if (entry.score === highScore) {
+            p.classList.add("highlight");
+        }
+        historyDiv.appendChild(p);
+    });
+}
+
+function loadHighScore() {
+    let scores = JSON.parse(localStorage.getItem("scores")) || [];
+    if (scores.length > 0) {
+        highScore = Math.max(...scores.map(entry => entry.score));
+        let highScoreEntry = scores.find(entry => entry.score === highScore);
+        highScoreDate = highScoreEntry.date.split(", ")[0];
+        highScoreTime = highScoreEntry.date.split(", ")[1];
+        updateHighScoreDisplay();
+    }
+}
+
+function checkHighScore() {
+    if (score > highScore) {
+        highScore = score;
+        highScoreDate = new Date().toLocaleDateString();
+        highScoreTime = new Date().toLocaleTimeString();
+        updateHighScoreDisplay();
+        loadScoreHistory(); // Refresh score history to highlight new high score
+    }
+}
+
+function updateHighScoreDisplay() {
+    document.getElementById("high-score").innerText = highScore;
+    document.getElementById("high-score-date").innerText = highScoreDate;
+    document.getElementById("high-score-time").innerText = highScoreTime;
+}
+
+// Restart Button Functionality
+document.getElementById("restart").addEventListener("click", function () {
+    // Save the current score before restarting
+    if (score > 0) {
+        saveScore(score);
+    }
+
+    // Reset the game
+    score = 0;
+    gameOver = false;
+    document.getElementById("score").innerText = score.toString();
+
+    if (currMoleTile) currMoleTile.innerHTML = "";
+    if (currPlantTile) currPlantTile.innerHTML = "";
+
+    currMoleTile = null;
+    currPlantTile = null;
+
+    // Clear the board before restarting the game
+    document.getElementById("board").innerHTML = "";
+
+    // Restart the game
+    setGame();
+});
+    </script>
+  </body>
+</html>

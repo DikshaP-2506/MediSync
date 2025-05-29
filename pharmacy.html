@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacy Locator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+    
+        h1 {
+            font-size: 2.5rem;
+            color: #1E3A8A;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+    
+        input {
+            padding: 12px;
+            font-size: 1rem;
+            width: 100%;
+            max-width: 400px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+    
+        input:focus {
+            border-color: #1E3A8A;
+            box-shadow: 0 0 8px rgba(30, 58, 138, 0.2);
+        }
+    
+        button {
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            background-color: #1E3A8A;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-top: 10px;
+        }
+    
+        button:hover {
+            background-color: #2563EB;
+            transform: translateY(-2px);
+        }
+    
+        button:active {
+            transform: translateY(0);
+        }
+    
+        ul {
+            list-style-type: none;
+            padding: 0;
+            width: 100%;
+            max-width: 600px;
+            margin-top: 20px;
+        }
+    
+        li {
+            background: #fff;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+    
+        li:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+    
+        li::before {
+            content: "📍";
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+    
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+    
+            input {
+                width: 90%;
+            }
+    
+            button {
+                width: 100%;
+                max-width: 400px;
+            }
+    
+            ul {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Nearby Pharmacies</h1>
+    <input type="text" id="address" placeholder="Enter your full address, district, or city in India">
+    <button onclick="getCoordinates()">Find Pharmacies</button>
+    <ul id="pharmacy-list"></ul>
+    
+    <script>
+        function getCoordinates() {
+            const address = document.getElementById("address").value;
+            if (!address) {
+                alert("Please enter an address.");
+                return;
+            }
+            
+            console.log("Fetching coordinates for address:", address);
+            
+            fetchAddress(address).then(coords => {
+                if (!coords) {
+                    const districtAddress = extractDistrict(address);
+                    console.log("Full address failed, retrying with district/state:", districtAddress);
+                    
+                    if (districtAddress) {
+                        fetchAddress(districtAddress).then(coords => {
+                            if (coords) {
+                                console.log("Coordinates found for fallback address:", coords);
+                                fetchPharmacies(coords.lat, coords.lon);
+                            } else {
+                                alert("Address not found. Try a broader location.");
+                            }
+                        });
+                    } else {
+                        alert("Address not found. Please enter a valid location in India.");
+                    }
+                } else {
+                    console.log("Coordinates found:", coords);
+                    fetchPharmacies(coords.lat, coords.lon);
+                }
+            });
+        }
+
+        function fetchAddress(address) {
+            return fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address + ', India')}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Geocoding API response:", data);
+                    if (data.length === 0) return null;
+                    return { lat: data[0].lat, lon: data[0].lon };
+                })
+                .catch(error => {
+                    console.error("Error fetching coordinates:", error);
+                    return null;
+                });
+        }
+
+        function extractDistrict(address) {
+            const parts = address.split(",").map(p => p.trim());
+            if (parts.length >= 3) {
+                return parts.slice(-2).join(", ");
+            }
+            return null;
+        }
+
+        function fetchPharmacies(lat, lon) {
+            console.log("Fetching pharmacies for coordinates:", lat, lon);
+            
+            fetch(`http://localhost:5000/api/pharmacies?lat=${lat}&lon=${lon}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Pharmacy API response:", data);
+                    const list = document.getElementById("pharmacy-list");
+                    list.innerHTML = "";
+                    if (data.length === 0) {
+                        list.innerHTML = "<li>No pharmacies found.</li>";
+                    } else {
+                        data.forEach(pharmacy => {
+                            const li = document.createElement("li");
+                            const name = pharmacy.tags.name || "Unnamed Pharmacy";
+                            const address = pharmacy.tags["addr:street"] ? `${pharmacy.tags["addr:street"]}, ${pharmacy.tags["addr:city"] || ""}, ${pharmacy.tags["addr:state"] || ""}, ${pharmacy.tags["addr:postcode"] || ""}` : "Address not available";
+                            li.textContent = `${name} - ${address}`;
+                            list.appendChild(li);
+                        });
+                    }
+                })
+                .catch(error => console.error("Error fetching pharmacy data:", error));
+        }
+    </script>
+</body>
+</html>

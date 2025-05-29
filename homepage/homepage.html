@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pharma Dashboard</title>
+    <link rel="stylesheet" href="homepage.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="homepage.js" defer></script>
+  </head>
+
+  <body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">
+        <h2>MediSync</h2>
+      </div>
+      <div class="profile">
+        <img
+          src="../assets/images/profile-icon.png"
+          onclick="gotoprofile()"
+          alt="User"
+        />
+      </div>
+      <nav>
+        <ul>
+          <li class="tab-btn" data-tab="today-medications">
+            Today's Medications
+          </li>
+          <li class="tab-btn" data-tab="add-medications">Add Medications</li>
+          <li class="tab-btn" data-tab="add-medications-ocr">
+            Add Medications (OCR)
+          </li>
+          <li class="tab-btn" data-tab="notifications">
+            Notifications <span class="badge">0</span>
+          </li>
+          <li class="tab-btn" data-tab="progress">Progress</li>
+          <li class="tab-btn" data-tab="games">Games</li>
+        </ul>
+        <a href="../pharmacy.html">Pharmacy locator</a>
+      </nav>
+
+      <div class="aichatbot">
+        <p>How may I help you?</p>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Top Navbar -->
+      <header class="top-navbar">
+        <div class="search-bar">
+          <input type="text" placeholder="Search for anything here..." />
+          <button>
+            <img src="../assets/images/search-icon.svg" alt="Search" />
+          </button>
+        </div>
+        <div class="right-section">
+          <div class="translate-select">
+            <img
+              width="16px"
+              src="../assets/images/translate-icon.png"
+              alt="Translate"
+            />
+            <select>
+              <option>English (US)</option>
+              <option>हिन्दी (Hindi)</option>
+              <option>Français</option>
+            </select>
+          </div>
+          <p class="greeting">Hello, Welcome</p>
+          <span class="clock">Loading...</span>
+        </div>
+      </header>
+
+      <!-- Content Sections (Tabs) -->
+      <div class="tab-content active" id="dashboard">
+        <h1>Dashboard</h1>
+        
+        <div class="dashboard-grid">
+          <!-- Medication Adherence Chart -->
+          <div class="chart-container">
+            <h2>Medication Adherence</h2>
+            <canvas id="adherenceChart"></canvas>
+          </div>
+
+          <!-- Medication Stock Status -->
+          <div class="chart-container">
+            <h2>Medication Stock Status</h2>
+            <canvas id="stockChart"></canvas>
+          </div>
+
+          <!-- Weekly Progress -->
+          <div class="chart-container">
+            <h2>Weekly Progress</h2>
+            <canvas id="weeklyProgressChart"></canvas>
+          </div>
+
+          <!-- Medication Distribution -->
+          <div class="chart-container">
+            <h2>Medication Distribution</h2>
+            <canvas id="distributionChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+          <div class="summary-card">
+            <h3>Total Medications</h3>
+            <p id="totalMeds">0</p>
+          </div>
+          <div class="summary-card">
+            <h3>Adherence Rate</h3>
+            <p id="adherenceRate">0%</p>
+          </div>
+          <div class="summary-card">
+            <h3>Low Stock Alerts</h3>
+            <p id="lowStockCount">0</p>
+          </div>
+          <div class="summary-card">
+            <h3>Next Medication</h3>
+            <p id="nextMedication">None</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="add-medications">
+        <h1>Add Medications</h1>
+
+        <!-- Medication Form -->
+        <form id="medication-form">
+          <input
+            type="text"
+            id="med-name"
+            placeholder="Enter Medication Name"
+            required
+          />
+          <input type="time" id="med-time" required />
+
+          <input
+            type="number"
+            id="med-quantity"
+            placeholder="Quantity left (e.g. 50)"
+            required
+          />
+          <button type="submit">Add Medication</button>
+        </form>
+
+        <!-- Medication Cards Section -->
+        <div id="medication-list" class="medication-container"></div>
+      </div>
+
+      <div class="tab-content" id="add-medications-ocr">
+        <h1>Add Medications using OCR</h1>
+        <p>
+          Upload an image of your medication to automatically detect its name
+        </p>
+
+        <form id="ocr-form" class="ocr-form">
+          <div class="preview-container">
+            <input type="file" id="medicationImage" accept="image/*">
+            <img id="imagePreview" src="#" alt="Image Preview" style="display: none; max-width: 300px; margin-top: 10px;">
+          </div>
+          <div class="form-group">
+            <label for="schedule">Schedule:</label>
+            <input type="text" id="schedule" value="daily">
+          </div>
+          <div class="form-group">
+            <label for="dosage">Dosage:</label>
+            <input type="text" id="dosage" value="1 tablet">
+          </div>
+          <button type="submit" class="upload-btn">Add Medication</button>
+        </form>
+
+        <!-- Display area for detected medication name (Optional, but good for feedback) -->
+        <div id="detectedMed" class="detected-med"></div>
+      </div>
+
+      <div class="tab-content" id="today-medications">
+        <h1>Today's Medications</h1>
+        <div id="today-medication-list" class="medication-container"></div>
+      </div>
+
+      <div class="tab-content" id="progress">
+        <h1>Progress</h1>
+        <p>Track your medication adherence progress.</p>
+        <div id="calendar"></div>
+        <!-- Calendar container -->
+      </div>
+
+      <div class="tab-content" id="notifications">
+        <h1>Notifications</h1>
+        <p>View recent alerts and reminders.</p>
+        <div id="notification-list" class="notification-container"></div>
+      </div>
+
+      <!-- Games Tab Content -->
+      <div class="tab-content" id="games">
+        <h1>Games</h1>
+        <div class="games-container">
+          <!-- Game Cards -->
+          <div class="game-card" onclick="redirectToGameWhackamole()">
+            <img
+              src="../assets/images/games/whackamole-icon.png"
+              alt="Whack a Mole"
+            />
+            <h3>Whack a Mole</h3>
+          </div>
+          <div class="game-card" onclick="redirectToGameMaze()">
+            <img src="../assets/images/games/maze-icon.png" alt="Maze Game" />
+            <h3>Maze Game</h3>
+          </div>
+          <div class="game-card" onclick="redirectToGameMemory()">
+            <img
+              src="../assets/images/games/memory-icon.png"
+              alt="Memory Game"
+            />
+            <h3>Memory Game</h3>
+          </div>
+        </div>
+
+        <!-- Progress Graph -->
+        <div class="progress-graph">
+          <h2>Games Progress</h2>
+          <canvas id="gamesProgressChart"></canvas>
+        </div>
+      </div>
+    </main>
+    <script>
+      window.addEventListener("mouseover", initLandbot, { once: true });
+      window.addEventListener("touchstart", initLandbot, { once: true });
+
+      var myLandbot;
+
+      function initLandbot() {
+        if (!myLandbot) {
+          var s = document.createElement("script");
+          s.type = "module";
+          s.async = true;
+          s.addEventListener("load", function () {
+            myLandbot = new Landbot.Livechat({
+              configUrl:
+                "https://storage.googleapis.com/landbot.online/v3/H-2809815-E7I1DO97NDOZLP87/index.json",
+            });
+
+            // Wait for Landbot to load, then apply custom styles
+            setTimeout(() => {
+              let chatWidget = document.querySelector(".LandbotLivechat"); // Target the chatbot
+              if (chatWidget) {
+                chatWidget.style.position = "fixed"; // Ensure fixed positioning
+                chatWidget.style.bottom = "24px"; // Distance from bottom
+                chatWidget.style.left = "4.5%"; // Distance from left
+                chatWidget.style.right = "auto"; // Remove default right alignment
+              }
+            }, 1000); // Small delay to ensure Landbot loads
+          });
+
+          s.src = "https://cdn.landbot.io/landbot-3/landbot-3.0.0.mjs";
+          var x = document.getElementsByTagName("script")[0];
+          x.parentNode.insertBefore(s, x);
+        }
+      }
+    </script>
+  </body>
+</html>

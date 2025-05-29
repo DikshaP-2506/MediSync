@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Memory Card Game</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .game-container {
+            display: flex;
+            gap: 20px;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 1200px;
+            width: 90%;
+        }
+
+        /* Score History */
+        .score-history {
+            flex: 1;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .score-history h3 {
+            margin-top: 0;
+            color: #2563eb;
+            font-size: 20px;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 10px;
+        }
+
+        #score-history {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        #score-history p {
+            margin: 10px 0;
+            padding: 10px;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+            color: #333;
+            transition: background 0.3s ease;
+        }
+
+        #score-history p.highlight {
+            background: #e3f2fd;
+            font-weight: bold;
+            border-left: 4px solid #2563eb;
+        }
+
+        /* Game Area */
+        .game-area {
+            flex: 2;
+            text-align: center;
+        }
+
+        .game-area h1 {
+            margin: 0;
+            color: #1e3a8a;
+            font-size: 32px;
+        }
+
+        .game-area p {
+            margin: 10px 0;
+            font-size: 18px;
+            color: #333;
+        }
+
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            gap: 15px;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .card {
+            width: 100px;
+            height: 100px;
+            background-color: #f1f1f1;
+            border-radius: 10px;
+            border: 2px solid #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        .card.flipped {
+            background-color: white;
+            transform: scale(1.1);
+        }
+
+        #restart {
+            padding: 10px 20px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s ease;
+            margin-top: 20px;
+        }
+
+        #restart:hover {
+            background: #1e3a8a;
+        }
+
+        /* High Score Panel */
+        .high-score-panel {
+            flex: 1;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .high-score-panel h3 {
+            margin-top: 0;
+            color: #2563eb;
+            font-size: 20px;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 10px;
+        }
+
+        #high-score-display {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        #high-score-display p {
+            margin: 10px 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        #high-score-display>p:first-child {
+            background: #2563EB;
+            /* Blue background */
+            color: white;
+            /* White text */
+            font-weight: bold;
+            /* Bold font */
+            padding: 10px;
+            border-radius: 5px;
+            ;
+            font-size: larger;
+        }
+
+
+        #high-score-display p.motivational-message {
+            font-style: italic;
+            color: #666;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+        /* Message styles */
+        #motivation-message,
+        #win-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 20px;
+            z-index: 100;
+            display: none;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column;
+                padding: 20px;
+            }
+
+            #game-board {
+                grid-template-columns: repeat(4, 80px);
+                gap: 10px;
+            }
+
+            .card {
+                width: 80px;
+                height: 80px;
+                font-size: 24px;
+            }
+
+            #restart {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #game-board {
+                grid-template-columns: repeat(4, 70px);
+                gap: 8px;
+            }
+
+            .card {
+                width: 70px;
+                height: 70px;
+                font-size: 20px;
+            }
+
+            #restart {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game-container">
+        <!-- Score History -->
+        <div class="score-history">
+            <h3>Score History</h3>
+            <div id="score-history"></div>
+        </div>
+
+        <!-- Game Area -->
+        <div class="game-area">
+            <h1>Memory Card Game</h1>
+            <p>Moves: <span id="moves">0</span></p>
+            <div id="game-board"></div>
+            <button id="restart">Restart Game</button>
+        </div>
+
+        <!-- High Score Panel -->
+        <div class="high-score-panel">
+            <h3>High Score</h3>
+            <div id="high-score-display">
+                <p>Moves: <span id="high-score">-</span></p>
+                <p>Date: <span id="high-score-date">-</span></p>
+                <p>Time: <span id="high-score-time">-</span></p>
+                <p class="motivational-message">Can you beat your high score?</p>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bg-music" loop>
+        <source src="Spring-Flowers(chosic.com).mp3" type="audio/mp3" />
+    </audio>
+
+    <div id="motivation-message"></div>
+    <div id="win-message"></div>
+
+    <script>
+        const cardArray = [
+            "🍎", "🍎", "🍌", "🍌", "🍉", "🍉", "🍇", "🍇",
+            "🍓", "🍓", "🥭", "🥭", "🍍", "🍍", "🥝", "🥝"
+        ];
+
+        // Declare global variables
+        let flippedCards = [];
+        let matchedCards = [];
+        let moves = 0;
+        let highScore = Infinity;
+        let highScoreDate = "-";
+        let highScoreTime = "-";
+
+        function shuffle(array) {
+            let shuffled = [...array];
+            return shuffled.sort(() => Math.random() - 0.5);
+        }
+
+        function initGame() {
+            const gameBoard = document.getElementById("game-board");
+            gameBoard.innerHTML = ""; // Clear board
+            let shuffledCards = shuffle(cardArray);
+
+            shuffledCards.forEach((fruit, index) => {
+                const card = document.createElement("div");
+                card.classList.add("card");
+                card.dataset.fruit = fruit;
+                card.dataset.index = index;
+                card.addEventListener("click", flipCard);
+
+                gameBoard.appendChild(card);
+            });
+
+            flippedCards = [];
+            matchedCards = [];
+            moves = 0;
+            document.getElementById("moves").innerText = moves;
+
+            loadScoreHistory(); // Load previous scores
+        }
+
+        function flipCard() {
+            if (
+                flippedCards.length < 2 &&
+                !this.classList.contains("flipped") &&
+                !matchedCards.includes(this)
+            ) {
+                this.innerText = this.dataset.fruit; // Show fruit
+                this.classList.add("flipped");
+                flippedCards.push(this);
+
+                if (flippedCards.length === 2) {
+                    checkMatch();
+                }
+            }
+        }
+
+        function checkMatch() {
+            moves++;
+            document.getElementById("moves").innerText = moves;
+
+            let [card1, card2] = flippedCards;
+            if (card1.dataset.fruit === card2.dataset.fruit) {
+                matchedCards.push(card1, card2);
+                flippedCards = [];
+
+                showMotivationalMessage(); // Show encouragement
+
+                if (matchedCards.length === cardArray.length) {
+                    setTimeout(() => {
+                        showWinMessage(moves); // Show win message
+                        saveScore(moves); // Save final score
+                    }, 500);
+                }
+            } else {
+                setTimeout(() => {
+                    card1.innerText = "";
+                    card2.innerText = "";
+                    card1.classList.remove("flipped");
+                    card2.classList.remove("flipped");
+                    flippedCards = [];
+                }, 1000);
+            }
+        }
+
+        // 💾 Save Score to Local Storage
+        function saveScore(score) {
+            let scores = JSON.parse(localStorage.getItem("memoryGameScores")) || [];
+            const now = new Date();
+            scores.push({
+                score: score,
+                date: now.toLocaleDateString(),
+                time: now.toLocaleTimeString()
+            });
+            localStorage.setItem("memoryGameScores", JSON.stringify(scores));
+            loadScoreHistory();
+            checkHighScore(scores);
+        }
+
+        // 📜 Load Score History
+        function loadScoreHistory() {
+            let scores = JSON.parse(localStorage.getItem("memoryGameScores")) || [];
+            let historyDiv = document.getElementById("score-history");
+            historyDiv.innerHTML = "";
+
+            // Check for high score first
+            checkHighScore(scores);
+
+            scores.slice().reverse().forEach(entry => {
+                let p = document.createElement("p");
+                p.innerText = `Moves: ${entry.score} - ${entry.date} ${entry.time || ""}`;
+                if (entry.score === highScore) {
+                    p.classList.add("highlight");
+                }
+                historyDiv.appendChild(p);
+            });
+        }
+
+        // Check and update high score
+        function checkHighScore(scores) {
+            if (scores.length > 0) {
+                highScore = Math.min(...scores.map(entry => entry.score)); // Lowest moves is the best
+                let highScoreEntry = scores.find(entry => entry.score === highScore);
+
+                if (highScoreEntry) {
+                    highScoreDate = highScoreEntry.date || "-";
+                    highScoreTime = highScoreEntry.time || "-";
+                }
+
+                updateHighScoreDisplay();
+            }
+        }
+
+        function updateHighScoreDisplay() {
+            document.getElementById("high-score").innerText = highScore === Infinity ? "-" : highScore;
+            document.getElementById("high-score-date").innerText = highScoreDate;
+            document.getElementById("high-score-time").innerText = highScoreTime;
+        }
+
+        // 🔥 Motivational Messages
+        function showMotivationalMessage() {
+            let totalPairs = cardArray.length / 2; // Total number of pairs
+            let remainingPairs = totalPairs - matchedCards.length / 2; // Remaining unmatched pairs
+            let message = "";
+
+            if (remainingPairs === Math.floor(totalPairs / 2)) {
+                message = "🔥 You're halfway there! Keep going!";
+            } else if (remainingPairs === 2) {
+                message = "💪 Just a few more! Stay focused!";
+            } else if (remainingPairs === 1) {
+                message = "🧠 One last pair! You got this!";
+            }
+
+            if (message) {
+                let messageDiv = document.getElementById("motivation-message");
+                messageDiv.innerText = message;
+                messageDiv.style.display = "block";
+
+                setTimeout(() => {
+                    messageDiv.style.display = "none"; // Hide after 2 sec
+                }, 2000);
+            }
+        }
+
+        function showWinMessage(moves) {
+            let winDiv = document.getElementById("win-message");
+            winDiv.innerText = `🎉 You won in ${moves} moves!`;
+            winDiv.style.display = "block";
+
+            setTimeout(() => {
+                winDiv.style.display = "none"; // Hide after 3 sec
+            }, 3000);
+        }
+
+        function playBackgroundMusic() {
+            let bgMusic = document.getElementById("bg-music");
+            bgMusic
+                .play()
+                .catch((error) => console.log("Autoplay blocked:", error));
+        }
+
+        document.addEventListener("click", playBackgroundMusic, { once: true });
+        document.addEventListener("touchstart", playBackgroundMusic, { once: true }); // For mobile users
+
+        document.getElementById("restart").addEventListener("click", initGame);
+
+        window.onload = function () {
+            initGame(); // Initialize the game
+        };
+    </script>
+</body>
+
+</html>

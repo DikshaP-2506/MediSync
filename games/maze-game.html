@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Maze Game</title>
+    <link rel="stylesheet" href="maze.css" />
+    <!-- Add FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+</head>
+
+<body>
+    <div class="game-container">
+        <!-- Score History -->
+        <div class="score-history">
+            <h3>Score History</h3>
+            <div id="score-history"></div>
+        </div>
+
+        <!-- Game Area -->
+        <div class="game-area">
+            <h1>Maze Game</h1>
+            <button id="startButton" onclick="startGame()">
+                <i class="fas fa-play"></i> Start Game
+            </button>
+            <div class="maze-container">
+                <canvas id="gameCanvas"></canvas>
+            </div>
+        </div>
+
+        <!-- High Score Panel -->
+        <div class="high-score-panel">
+            <h3>High Score</h3>
+            <div id="high-score-display">
+                <p>Score: <span id="high-score">0</span></p>
+                <p>Date: <span id="high-score-date">-</span></p>
+                <p>Time: <span id="high-score-time">-</span></p>
+                <p class="motivational-message">Can you beat your high score?</p>
+            </div>
+        </div>
+    </div>
+
+
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .game-container {
+            display: flex;
+            gap: 20px;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            width: 90%;
+        }
+
+        /* Score History */
+        .score-history {
+            flex: 1;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .score-history h3 {
+            margin-top: 0;
+            color: #2563EB;
+            font-size: 20px;
+            border-bottom: 2px solid #2563EB;
+            padding-bottom: 10px;
+        }
+
+        #score-history {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        #score-history p {
+            margin: 10px 0;
+            padding: 10px;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+            color: #333;
+            transition: background 0.3s ease;
+        }
+
+        #score-history p.highlight {
+            background: #e3f2fd;
+            font-weight: bold;
+            border-left: 4px solid #2563EB;
+        }
+
+        /* Game Area */
+        .game-area {
+            flex: 2;
+            text-align: center;
+        }
+
+        .game-area h1 {
+            margin: 0;
+            color: #1E3A8A;
+            font-size: 32px;
+        }
+
+        button {
+            margin: 20px 0;
+            padding: 10px 20px;
+            background: #2563EB;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #1E3A8A;
+        }
+
+        button i {
+            margin-right: 5px;
+        }
+
+        .maze-container {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        canvas {
+            border: 5px solid #ddd;
+            background-color: white;
+            border-radius: 10px;
+            width: 100%;
+            height: auto;
+            max-width: 600px;
+        }
+
+        /* High Score Panel */
+        .high-score-panel {
+            flex: 1;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .high-score-panel h3 {
+            margin-top: 0;
+            color: #2563EB;
+            font-size: 20px;
+            border-bottom: 2px solid #2563EB;
+            padding-bottom: 10px;
+        }
+
+        #high-score-display {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        #high-score-display p {
+            margin: 10px 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        #high-score-display>p:first-child {
+            background: #2563EB;
+            /* Blue background */
+            color: white;
+            /* White text */
+            font-weight: bold;
+            /* Bold font */
+            padding: 10px;
+            border-radius: 5px;
+            ;
+            font-size: larger;
+        }
+
+        #high-score-display p.motivational-message {
+            font-style: italic;
+            color: #666;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column;
+                padding: 20px;
+            }
+
+            canvas {
+                max-width: 100%;
+            }
+
+            #messageBox {
+                top: 10px;
+                right: 10px;
+                font-size: 0.9rem;
+                padding: 8px 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 20px;
+            }
+
+            button {
+                padding: 7px 14px;
+                font-size: 12px;
+            }
+
+            .game-container {
+                padding: 15px;
+            }
+
+            .maze-container {
+                margin-top: 10px;
+            }
+        }
+    </style>
+    <script>
+
+        let highScore = 0;
+        let highScoreDate = "-";
+        let highScoreTime = "-";
+        document.addEventListener("DOMContentLoaded", function () {
+
+
+            loadScoreHistory();
+            let highScore = localStorage.getItem("high-score");
+            if (highScore) {
+                document.getElementById("high-score").innerText = highScore;
+            }
+            const canvas = document.getElementById("gameCanvas");
+            const ctx = canvas.getContext("2d");
+
+            canvas.width = 600;
+            canvas.height = 600;
+
+            const tileSize = 40;
+            let startTime, endTime;
+            let totalMoves = 0,
+                validMoves = 0,
+                wrongMoves = 0;
+            let gameStarted = false;
+
+            let maze = generateRandomMaze(15, 15);
+            const player = { x: 1, y: 1 };
+            const goal = { x: maze[0].length - 2, y: maze.length - 2 };
+
+            const playerImage = new Image();
+            playerImage.src =
+                "https://img.icons8.com/color/48/000000/circled-user-male-skin-type-7.png";
+            const goalImage = new Image();
+            goalImage.src = "https://img.icons8.com/color/48/000000/flag.png";
+
+            const moveSound = new Audio(
+                "https://assets.mixkit.co/active_storage/sfx/3005/3005-preview.mp3"
+            );
+            const winSound = new Audio(
+                "https://assets.mixkit.co/active_storage/sfx/1069/1069-preview.mp3"
+            );
+
+            moveSound.volume = 0.5;
+            winSound.volume = 0.5;
+
+            function generateRandomMaze(rows, cols) {
+                let maze = Array.from({ length: rows }, () => Array(cols).fill(1));
+
+                function carvePath(x, y) {
+                    maze[y][x] = 0;
+                    const directions = [
+                        [1, 0],
+                        [-1, 0],
+                        [0, 1],
+                        [0, -1],
+                    ].sort(() => Math.random() - 0.5);
+
+                    for (let [dx, dy] of directions) {
+                        const nx = x + dx * 2,
+                            ny = y + dy * 2;
+                        if (
+                            nx >= 0 &&
+                            nx < cols &&
+                            ny >= 0 &&
+                            ny < rows &&
+                            maze[ny][nx] === 1
+                        ) {
+                            maze[y + dy][x + dx] = 0;
+                            carvePath(nx, ny);
+                        }
+                    }
+                }
+
+                carvePath(1, 1);
+                maze[rows - 3][cols - 2] = 0;
+                maze[rows - 2][cols - 2] = 0;
+                return maze;
+            }
+
+            function drawMaze() {
+                for (let row = 0; row < maze.length; row++) {
+                    for (let col = 0; col < maze[row].length; col++) {
+                        ctx.fillStyle = maze[row][col] === 1 ? "#333" : "#fff";
+                        ctx.fillRect(col * tileSize, row * tileSize, tileSize, tileSize);
+                    }
+                }
+            }
+
+            function drawPlayer() {
+                ctx.drawImage(
+                    playerImage,
+                    player.x * tileSize,
+                    player.y * tileSize,
+                    tileSize,
+                    tileSize
+                );
+            }
+
+            function drawGoal() {
+                ctx.drawImage(
+                    goalImage,
+                    goal.x * tileSize,
+                    goal.y * tileSize,
+                    tileSize,
+                    tileSize
+                );
+            }
+
+            function showWinPopup(time) {
+                alert(`You completed the maze in ${time} seconds! 🎉`);
+                winSound.play();
+            }
+
+            document.addEventListener("keydown", (event) => {
+                if (!gameStarted) return;
+
+                let newX = player.x,
+                    newY = player.y;
+                totalMoves++;
+
+                if (event.key === "ArrowUp") newY--;
+                if (event.key === "ArrowDown") newY++;
+                if (event.key === "ArrowLeft") newX--;
+                if (event.key === "ArrowRight") newX++;
+
+                if (maze[newY] && maze[newY][newX] === 0) {
+                    player.x = newX;
+                    player.y = newY;
+                    validMoves++;
+                    moveSound.play();
+                } else {
+                    wrongMoves++;
+                }
+
+                if (player.x === goal.x && player.y === goal.y) {
+                    endTime = Date.now();
+                    const timeTaken = ((endTime - startTime) / 1000).toFixed(2);
+                    showWinPopup(timeTaken);
+                    saveScore(timeTaken);
+                }
+
+                draw();
+            });
+
+            function saveScore(timeTaken) {
+                let problemSolving = (100 - timeTaken * 5).toFixed(2);
+                if (problemSolving < 0) problemSolving = 0;
+
+                fetch("http://localhost:5500/api/score", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        problemSolving: parseFloat(problemSolving),
+                    }),
+                })
+                    .then((response) => response.json())
+                    .then(() => console.log("Score saved successfully!"))
+                    .catch((error) => console.error("Error:", error));
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawMaze();
+                drawGoal();
+                drawPlayer();
+            }
+
+            window.startGame = () => {
+                maze = generateRandomMaze(15, 15);
+                player.x = 1;
+                player.y = 1;
+                startTime = Date.now();
+                totalMoves = 0;
+                validMoves = 0;
+                wrongMoves = 0;
+                gameStarted = true;
+                draw();
+            };
+
+            window.onload = draw;
+
+
+
+            function saveScore(timeTaken, currentdate) {
+                let scores = JSON.parse(localStorage.getItem("maze-scores")) || [];
+                scores.push({ score: timeTaken, date: new Date().toLocaleString() });
+                localStorage.setItem("maze-scores", JSON.stringify(scores));
+                loadScoreHistory();
+                checkHighScore(timeTaken);
+            }
+
+
+            function loadScoreHistory() {
+                let scores = JSON.parse(localStorage.getItem("maze-scores")) || [];
+                let historyDiv = document.getElementById("score-history");
+                historyDiv.innerHTML = "";
+
+                scores.slice().reverse().forEach(entry => {
+                    let p = document.createElement("p");
+                    p.innerText = `Time: ${entry.score}s, Date: ${entry.date}`;
+                    historyDiv.appendChild(p);
+                });
+            }
+
+
+            function checkHighScore(timeTaken) {
+                let highScore = parseFloat(localStorage.getItem("high-score")) || 0;
+                if (timeTaken < highScore || highScore === 0) {
+                    localStorage.setItem("high-score", timeTaken);
+                    document.getElementById("high-score").innerText = timeTaken;
+                    document.getElementById("high-score-date").innerText = new Date().toLocaleString().split(", ")[0];
+                    document.getElementById("high-score-time").innerText = new Date().toLocaleString().split(", ")[1];
+                }
+            }
+
+
+            function updateHighScoreDisplay() {
+                document.getElementById("high-score").innerText = highScore;
+                document.getElementById("high-score-date").innerText = new Date().toLocaleString().split(", ")[0];
+                document.getElementById("high-score-time").innerText = new Date().toLocaleString().split(", ")[1];
+            }
+        });
+
+    </script>
+</body>
+
+</html>

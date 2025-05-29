@@ -1,0 +1,17 @@
+.profile-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+}
+
+.profile-info {
+    width: 40%;
+    background-color: #f0f0f0;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.profile-empty-space {
+    width: 60%;
+    background-color: white;
+}
