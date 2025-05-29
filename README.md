@@ -17,24 +17,18 @@ MediSync is a comprehensive medication management system that helps users track 
 - Easy scheduling of detected medications
 
 ### 3. Smart Notifications
-- SMS reminders for medication times
-- Caregiver alerts for missed doses
+- SMS reminders for medication time
 - Low stock notifications
 
-### 4. Progress Tracking
-- Medication adherence tracking
-- Visual progress reports
-- Calendar view of medication history
-
-### 5. Interactive Games
+### 4. Interactive Games
 - Memory Game
 - Maze Game
 - Whack-a-Mole
 
-### 6. Pharmacy Locator
+### 5. Pharmacy Locator
 - Find nearby pharmacies
 
-### 7. AI Chatbot Assistant
+### 6. AI Chatbot Assistant
 - 24/7 medication support
 - Quick answers to medication queries
 
