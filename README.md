@@ -100,11 +100,6 @@ run signup.html
 - `POST /mark-taken` - Mark medication as taken
 - `GET /api/pharmacies` - Get nearby pharmacies
 
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
 ## Acknowledgments
 
 - OpenStreetMap for pharmacy location data
